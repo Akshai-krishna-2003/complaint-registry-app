@@ -57,6 +57,7 @@ class _AuthScreenState extends State<AuthScreen> {
         _emailCtrl.text.trim(),
         _passwordCtrl.text.trim(),
       );
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       result = await _authService.signUp(
         studentId: _studentIdCtrl.text.trim(),
