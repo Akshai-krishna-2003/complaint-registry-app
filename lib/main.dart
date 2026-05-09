@@ -1,116 +1,190 @@
+// ===================== TEST SCREEN =====================
 import 'package:flutter/material.dart';
-import 'package:registry/src/common/app_colors.dart';
+import 'package:registry/src/common/app_theme.dart';
+import 'package:registry/src/common/widgets/app_buttons.dart';
+import 'package:registry/src/common/widgets/app_snackbar.dart';
+import 'package:registry/src/common/widgets/app_text_field.dart';
+import 'package:registry/src/common/widgets/complaint_card.dart';
+import 'package:registry/src/common/widgets/status_chip.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+class TestScreen extends StatelessWidget {
+  TestScreen({super.key});
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final TextEditingController nameCtrl = TextEditingController();
+  final TextEditingController emailCtrl = TextEditingController();
+  final TextEditingController passwordCtrl = TextEditingController();
 
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          primary: AppColors.primary,
-          secondary: AppColors.secondary,
-          error: AppColors.failure,
-          background: AppColors.background,
-          surface: AppColors.surface,
-        ),
-        scaffoldBackgroundColor: AppColors.background,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
+  final List<Map<String, String>> complaints = [
+    {
+      'type': 'WiFi Issue',
+      'status': 'Pending',
+      'date': '10 May 2026',
+      'location': 'Main Library',
+    },
+    {
+      'type': 'Hostel Complaint',
+      'status': 'Under Review',
+      'date': '09 May 2026',
+      'location': 'Block C, Room 302',
+    },
+    {
+      'type': 'Exam Related Complaint',
+      'status': 'Resolved',
+      'date': '08 May 2026',
+      'location': 'Exam Hall 2',
+    },
+    {
+      'type': 'Cafeteria Complaint',
+      'status': 'Rejected',
+      'date': '07 May 2026',
+      'location': 'Central Canteen',
+    },
+  ];
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+  void _showSnackbars(BuildContext context) {
+    AppSnackbar.success(context, 'This is a success snackbar');
+    Future.delayed(const Duration(seconds: 4), () {
+      AppSnackbar.error(context, 'This is an error snackbar');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: .center,
+      appBar: AppBar(title: const Text('UI Components Test')),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: ListView(
           children: [
-            const Text('You have pushed the button this many times:'),
+            const SizedBox(height: 20),
             Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+              'Text Fields',
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
+            const SizedBox(height: 16),
+            AppTextField(
+              controller: nameCtrl,
+              label: 'Full Name',
+              hint: 'Enter your name',
+              prefixIcon: const Icon(
+                Icons.person_outline,
+                color: AppTheme.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              controller: emailCtrl,
+              label: 'Email',
+              hint: 'you@example.com',
+              keyboardType: TextInputType.emailAddress,
+              prefixIcon: const Icon(
+                Icons.email_outlined,
+                color: AppTheme.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              controller: passwordCtrl,
+              label: 'Password',
+              obscureText: true,
+              suffixIcon: const Icon(
+                Icons.visibility_off_outlined,
+                color: AppTheme.primary,
+              ),
+            ),
+            const SizedBox(height: 16),
+            AppTextField(
+              controller: TextEditingController(text: 'Read-only content'),
+              label: 'Read-only Field',
+              readOnly: true,
+            ),
+
+            const SizedBox(height: 32),
+            Text('Buttons', style: Theme.of(context).textTheme.headlineSmall),
+            const SizedBox(height: 16),
+            AppPrimaryButton(
+              label: 'Primary Action',
+              icon: const Icon(Icons.check, size: 20),
+              onPressed: () =>
+                  AppSnackbar.success(context, 'Primary button pressed'),
+            ),
+            const SizedBox(height: 12),
+            AppPrimaryButton(
+              label: 'Loading State',
+              isLoading: true,
+              onPressed: () {},
+            ),
+            const SizedBox(height: 12),
+            AppOutlinedButton(
+              label: 'Outlined Action',
+              onPressed: () =>
+                  AppSnackbar.error(context, 'Outlined button pressed'),
+            ),
+            const SizedBox(height: 12),
+            AppPrimaryButton(
+              label: 'Show Snackbars',
+              onPressed: () => _showSnackbars(context),
+            ),
+
+            const SizedBox(height: 32),
+            Text(
+              'Status Chips',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              children: [
+                StatusChip(status: 'Pending'),
+                StatusChip(status: 'Under Review'),
+                StatusChip(status: 'Resolved'),
+                StatusChip(status: 'Rejected'),
+              ],
+            ),
+
+            const SizedBox(height: 32),
+            Text(
+              'Complaint Cards',
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            const SizedBox(height: 16),
+            ...complaints.map(
+              (c) => ComplaintCard(
+                complaintType: c['type']!,
+                status: c['status']!,
+                date: c['date']!,
+                location: c['location']!,
+                onTap: () => AppSnackbar.show(
+                  context,
+                  message: 'Tapped on ${c['type']}',
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 32),
+            AppPrimaryButton(
+              label: 'Test Error Snackbar',
+              icon: const Icon(Icons.warning_amber_rounded, size: 20),
+              onPressed: () =>
+                  AppSnackbar.error(context, 'Something went wrong.'),
+            ),
+            const SizedBox(height: 40),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
     );
   }
+}
+
+// ===================== MAIN ENTRY =====================
+void main() {
+  runApp(
+    MaterialApp(
+      title: 'UniComplaints UI Test',
+      theme: AppTheme.lightTheme,
+      debugShowCheckedModeBanner: false,
+      home: TestScreen(),
+    ),
+  );
 }
