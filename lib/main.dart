@@ -6,6 +6,7 @@ import 'package:registry/src/common/widgets/app_snackbar.dart';
 import 'package:registry/src/common/widgets/app_text_field.dart';
 import 'package:registry/src/common/widgets/complaint_card.dart';
 import 'package:registry/src/common/widgets/status_chip.dart';
+import 'package:registry/src/features/auth/presentation/auth_screen.dart';
 
 class TestScreen extends StatelessWidget {
   TestScreen({super.key});
@@ -105,8 +106,10 @@ class TestScreen extends StatelessWidget {
             AppPrimaryButton(
               label: 'Primary Action',
               icon: const Icon(Icons.check, size: 20),
-              onPressed: () =>
-                  AppSnackbar.success(context, 'Primary button pressed'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => AuthScreen()),
+              ),
             ),
             const SizedBox(height: 12),
             AppPrimaryButton(
