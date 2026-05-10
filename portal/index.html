@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UniComplaints Admin</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          sans-serif;
+        background: #f8f9fc;
+        color: #191c20;
+        height: 100vh;
+      }
+      :root {
+        --primary: #1a3a5c;
+        --primary-light: #2b4f74;
+        --gold: #d49a3e;
+        --success: #27ae60;
+        --danger: #c0392b;
+        --warning: #e67e22;
+        --info: #2980b9;
+        --surface: #ffffff;
+        --bg: #f8f9fc;
+        --text: #191c20;
+        --text-secondary: #5f6b7a;
+        --border: #e0e4e8;
+        --radius: 16px;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+        --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.08);
+        --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .login-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--primary) 0%, #0c1f33 100%);
+      }
+      .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 28px;
+        padding: 48px 40px;
+        box-shadow: var(--shadow-lg);
+        width: 100%;
+        max-width: 420px;
+        text-align: center;
+      }
+      .login-card h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 12px;
+      }
+      .login-card p {
+        color: var(--text-secondary);
+        margin-bottom: 36px;
+        font-size: 16px;
+      }
+      .login-card input {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 20px;
+        font-size: 16px;
+        outline: none;
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition);
+      }
+      .login-card input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(26, 58, 92, 0.1);
+      }
+      .login-card button {
+        width: 100%;
+        padding: 16px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius);
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition:
+          background var(--transition),
+          transform var(--transition);
+      }
+      .login-card button:hover {
+        background: var(--primary-light);
+        transform: translateY(-1px);
+      }
+      .login-error {
+        color: var(--danger);
+        margin-top: 18px;
+        display: none;
+        font-weight: 500;
+      }
+
+      .dashboard {
+        display: flex;
+        height: 100vh;
+      }
+      .sidebar {
+        width: 280px;
+        background: linear-gradient(180deg, var(--primary) 0%, #0c1f33 100%);
+        color: white;
+        padding: 36px 28px;
+        display: flex;
+        flex-direction: column;
+        box-shadow: var(--shadow-md);
+      }
+      .sidebar h2 {
+        font-size: 26px;
+        font-weight: 700;
+        margin-bottom: 48px;
+        text-align: center;
+        letter-spacing: -0.3px;
+      }
+      .sidebar nav a {
+        display: flex;
+        align-items: center;
+        padding: 14px 18px;
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        font-weight: 500;
+        transition: all var(--transition);
+      }
+      .sidebar nav a:hover,
+      .sidebar nav a.active {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+      }
+      .sidebar nav a .icon {
+        margin-right: 14px;
+        font-size: 22px;
+      }
+      .logout-btn {
+        margin-top: auto;
+        background: rgba(255, 255, 255, 0.08);
+        border: none;
+        color: white;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background var(--transition);
+      }
+      .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+      .logout-btn .icon {
+        margin-right: 10px;
+      }
+
+      .main-content {
+        flex: 1;
+        padding: 48px 40px;
+        overflow-y: auto;
+        background: var(--bg);
+      }
+      .header {
+        margin-bottom: 40px;
+      }
+      .header h1 {
+        font-size: 34px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: var(--text);
+      }
+      .header p {
+        color: var(--text-secondary);
+        font-size: 18px;
+      }
+
+      .complaints-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+        gap: 24px;
+      }
+
+      .complaint-card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 28px;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--border);
+        transition: all var(--transition);
+        cursor: pointer;
+      }
+      .complaint-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
+        border-color: #cbd0d8;
+      }
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .card-header h3 {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--primary);
+      }
+      .status-badge {
+        padding: 6px 16px;
+        border-radius: 30px;
+        font-size: 13px;
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+      .status-Pending {
+        background: var(--warning);
+      }
+      .status-Under-Review {
+        background: var(--info);
+      }
+      .status-Resolved {
+        background: var(--success);
+      }
+      .status-Rejected {
+        background: var(--danger);
+      }
+
+      .detail-row {
+        display: flex;
+        margin-bottom: 14px;
+        font-size: 15px;
+      }
+      .detail-row .label {
+        width: 105px;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+      .detail-row .value {
+        flex: 1;
+        color: var(--text);
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.4);
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        overflow-y: auto;
+        backdrop-filter: blur(4px);
+      }
+      .modal.active {
+        display: flex;
+      }
+      .modal-content {
+        background: white;
+        border-radius: 28px;
+        padding: 40px;
+        width: 90%;
+        max-width: 720px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: var(--shadow-lg);
+      }
+      .modal-close {
+        position: absolute;
+        top: 20px;
+        right: 24px;
+        background: none;
+        border: none;
+        font-size: 32px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        transition: color var(--transition);
+        line-height: 1;
+      }
+      .modal-close:hover {
+        color: var(--primary);
+      }
+      .modal-content h2 {
+        margin-bottom: 28px;
+        color: var(--primary);
+        font-size: 28px;
+      }
+      .modal-section {
+        margin-bottom: 30px;
+      }
+      .modal-section h3 {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 14px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+      }
+      .modal-section h3::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+        margin-left: 14px;
+      }
+      .evidence-img {
+        width: 100%;
+        max-height: 350px;
+        object-fit: cover;
+        border-radius: 14px;
+        margin-top: 8px;
+        box-shadow: var(--shadow-sm);
+        transition: transform var(--transition);
+        cursor: pointer;
+      }
+      .evidence-img:hover {
+        transform: scale(1.02);
+      }
+      .reply-list {
+        margin-bottom: 24px;
+      }
+      .reply-item {
+        background: var(--bg);
+        padding: 18px 20px;
+        border-radius: 14px;
+        margin-bottom: 14px;
+        border-left: 5px solid var(--primary);
+        box-shadow: var(--shadow-sm);
+      }
+      .reply-item .reply-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-weight: 700;
+        color: var(--primary);
+      }
+      .reply-item .reply-date {
+        font-size: 13px;
+        color: var(--text-secondary);
+        font-weight: 400;
+      }
+      textarea,
+      select {
+        width: 100%;
+        padding: 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        font-size: 16px;
+        margin-bottom: 18px;
+        font-family: inherit;
+        resize: vertical;
+        background: var(--surface);
+        transition: border-color var(--transition);
+      }
+      textarea:focus,
+      select:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(26, 58, 92, 0.1);
+      }
+      .btn {
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 15px;
+        border: none;
+        cursor: pointer;
+        transition: all var(--transition);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+      }
+      .btn-primary:hover {
+        background: var(--primary-light);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+      .btn-secondary {
+        background: #e1e5ea;
+        color: var(--text);
+      }
+      .btn-secondary:hover {
+        background: #cdd3da;
+      }
+      .btn-gold {
+        background: var(--gold);
+        color: white;
+      }
+      .btn-gold:hover {
+        background: #b87d2e;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+      .modal-actions {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+      <div class="login-card">
+        <h1>🔐 Admin Portal</h1>
+        <p>University Complaint Registry</p>
+        <input
+          type="text"
+          id="username"
+          placeholder="Username"
+          autocomplete="off"
+        />
+        <input type="password" id="password" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <div id="loginError" class="login-error">Invalid credentials</div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardPage" class="dashboard" style="display: none">
+      <div class="sidebar">
+        <h2>UniComplaints</h2>
+        <nav>
+          <a href="#" class="active"
+            ><span class="icon">📋</span> All Complaints</a
+          >
+        </nav>
+        <button class="logout-btn" onclick="logout()">
+          <span class="icon">🚪</span> Logout
+        </button>
+      </div>
+      <div class="main-content">
+        <div class="header">
+          <h1>Complaints Dashboard</h1>
+          <p>Manage student complaints – update status, add replies</p>
+        </div>
+        <div id="complaintsContainer" class="complaints-grid"></div>
+      </div>
+    </div>
+
+    <!-- Detail / Action Modal -->
+    <div id="detailModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeDetailModal()">
+          &times;
+        </button>
+        <div id="modalBody"></div>
+      </div>
+    </div>
+
+    <script>
+      // ---------- CONFIG ----------
+      const SUPABASE_URL = "https://ufhdfistjnrhcefqvojp.supabase.co";
+      const ANON_KEY = "ANON_KEY_IS_SECRET";
+      const API_BASE = `${SUPABASE_URL}/rest/v1`;
+
+      // ---------- STATE ----------
+      let currentComplaintId = null;
+      let currentComplaintData = null;
+
+      // ---------- AUTH ----------
+      function login() {
+        const u = document.getElementById("username").value;
+        const p = document.getElementById("password").value;
+        if (u === "admin" && p === "admin") {
+          sessionStorage.setItem("adminAuth", "true");
+          showDashboard();
+        } else {
+          document.getElementById("loginError").style.display = "block";
+        }
+      }
+      function logout() {
+        sessionStorage.removeItem("adminAuth");
+        showLogin();
+      }
+      function showLogin() {
+        document.getElementById("loginPage").style.display = "flex";
+        document.getElementById("dashboardPage").style.display = "none";
+      }
+      function showDashboard() {
+        document.getElementById("loginPage").style.display = "none";
+        document.getElementById("dashboardPage").style.display = "flex";
+        loadComplaints();
+      }
+      window.onload = () => {
+        if (sessionStorage.getItem("adminAuth") === "true") showDashboard();
+      };
+
+      // ---------- API HELPERS ----------
+      async function fetchComplaints() {
+        const res = await fetch(
+          `${API_BASE}/complaints?select=*&order=created_at.desc`,
+          {
+            headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },
+          },
+        );
+        if (!res.ok) throw new Error("Failed to fetch complaints");
+        return await res.json();
+      }
+
+      async function loadComplaints() {
+        try {
+          const complaints = await fetchComplaints();
+          renderComplaints(complaints);
+        } catch (err) {
+          document.getElementById("complaintsContainer").innerHTML =
+            '<p style="color:red;">Error loading complaints.</p>';
+        }
+      }
+
+      async function fetchComplaintById(id) {
+        const res = await fetch(`${API_BASE}/complaints?id=eq.${id}`, {
+          headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },
+        });
+        const data = await res.json();
+        return data[0];
+      }
+
+      async function fetchReplies(complaintId) {
+        const res = await fetch(
+          `${API_BASE}/admin_replies?complaint_id=eq.${complaintId}&order=created_at.asc`,
+          {
+            headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },
+          },
+        );
+        if (!res.ok) return [];
+        return await res.json();
+      }
+
+      async function updateStatus(complaintId, newStatus) {
+        await fetch(`${API_BASE}/complaints?id=eq.${complaintId}`, {
+          method: "PATCH",
+          headers: {
+            apikey: ANON_KEY,
+            Authorization: `Bearer ${ANON_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        });
+      }
+
+      async function addReply(complaintId, adminName, replyText) {
+        await fetch(`${API_BASE}/admin_replies`, {
+          method: "POST",
+          headers: {
+            apikey: ANON_KEY,
+            Authorization: `Bearer ${ANON_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify({
+            complaint_id: complaintId,
+            admin_name: adminName,
+            reply: replyText,
+          }),
+        });
+      }
+
+      // ---------- RENDER ----------
+      function formatDate(d) {
+        if (!d) return "";
+        return new Date(d).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      }
+
+      function getStatusClass(status) {
+        return `status-${status.replace(/\s+/g, "-")}`;
+      }
+
+      function renderComplaints(complaints) {
+        const container = document.getElementById("complaintsContainer");
+        if (!complaints || complaints.length === 0) {
+          container.innerHTML =
+            '<p style="text-align:center; color:gray;">No complaints found.</p>';
+          return;
+        }
+        container.innerHTML = complaints
+          .map(
+            (c) => `
+        <div class="complaint-card" onclick="openDetailModal('${c.id}')">
+          <div class="card-header">
+            <h3>${c.complaint_type}</h3>
+            <span class="status-badge ${getStatusClass(c.status)}">${c.status}</span>
+          </div>
+          <div class="detail-row"><span class="label">Student</span><span class="value">${c.student_name} (${c.student_id})</span></div>
+          <div class="detail-row"><span class="label">Email</span><span class="value">${c.email}</span></div>
+          <div class="detail-row"><span class="label">Location</span><span class="value">${c.location}</span></div>
+          <div class="detail-row"><span class="label">Date</span><span class="value">${formatDate(c.created_at)}</span></div>
+          <div class="detail-row"><span class="label">Description</span><span class="value">${c.description.substring(0, 100)}...</span></div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      async function loadComplaints() {
+        try {
+          const complaints = await fetchComplaints();
+          renderComplaints(complaints);
+        } catch (err) {
+          document.getElementById("complaintsContainer").innerHTML =
+            '<p style="color:red;">Error loading complaints.</p>';
+        }
+      }
+
+      // ---------- MODAL ----------
+      async function openDetailModal(complaintId) {
+        currentComplaintId = complaintId;
+        try {
+          const complaint = await fetchComplaintById(complaintId);
+          const replies = await fetchReplies(complaintId);
+          currentComplaintData = complaint;
+          renderModalContent(complaint, replies);
+          document.getElementById("detailModal").classList.add("active");
+        } catch (err) {
+          alert("Failed to load complaint details");
+        }
+      }
+
+      function closeDetailModal() {
+        document.getElementById("detailModal").classList.remove("active");
+        currentComplaintId = null;
+        currentComplaintData = null;
+        loadComplaints();
+      }
+
+      function renderModalContent(complaint, replies) {
+        const body = document.getElementById("modalBody");
+        // Build accused person line if present
+        const accusedLine = complaint.accused_person
+          ? `<p><strong>Accused Person:</strong> ${complaint.accused_person}</p>`
+          : "";
+        body.innerHTML = `
+        <h2>${complaint.complaint_type}</h2>
+        <span class="status-badge ${getStatusClass(complaint.status)}" style="margin-bottom: 20px; display: inline-block;">${complaint.status}</span>
+
+        <div class="modal-section">
+          <h3>Student Information</h3>
+          <p><strong>Name:</strong> ${complaint.student_name} (${complaint.student_id})</p>
+          <p><strong>Email:</strong> ${complaint.email}</p>
+          <p><strong>Location:</strong> ${complaint.location}</p>
+          ${accusedLine}
+          <p><strong>Date:</strong> ${formatDate(complaint.created_at)}</p>
+        </div>
+
+        <div class="modal-section">
+          <h3>Description</h3>
+          <p>${complaint.description}</p>
+        </div>
+
+        ${
+          complaint.evidence_url
+            ? `
+        <div class="modal-section">
+          <h3>Evidence</h3>
+          <img src="${complaint.evidence_url}" class="evidence-img" onclick="window.open('${complaint.evidence_url}')">
+        </div>`
+            : ""
+        }
+
+        <div class="modal-section">
+          <h3>Admin Replies</h3>
+          <div class="reply-list">
+            ${
+              replies.length === 0
+                ? '<p style="color:gray;">No replies yet.</p>'
+                : replies
+                    .map(
+                      (r) => `
+                <div class="reply-item">
+                  <div class="reply-header">
+                    <span>${r.admin_name || "Administrator"}</span>
+                    <span class="reply-date">${formatDate(r.created_at)}</span>
+                  </div>
+                  <p>${r.reply}</p>
+                </div>
+              `,
+                    )
+                    .join("")
+            }
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <h3>Actions</h3>
+          <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center;">
+            <select id="statusSelect" style="flex: 1; min-width: 150px;">
+              <option value="">Change Status</option>
+              <option value="Pending" ${complaint.status === "Pending" ? "selected" : ""}>Pending</option>
+              <option value="Under Review" ${complaint.status === "Under Review" ? "selected" : ""}>Under Review</option>
+              <option value="Resolved" ${complaint.status === "Resolved" ? "selected" : ""}>Resolved</option>
+              <option value="Rejected" ${complaint.status === "Rejected" ? "selected" : ""}>Rejected</option>
+            </select>
+            <button class="btn btn-primary" onclick="changeStatusFromModal()">Update Status</button>
+          </div>
+          <textarea id="replyText" rows="3" placeholder="Add a reply..."></textarea>
+          <button class="btn btn-gold" onclick="submitReplyFromModal()">Submit Reply</button>
+        </div>
+      `;
+      }
+
+      async function changeStatusFromModal() {
+        const select = document.getElementById("statusSelect");
+        const newStatus = select.value;
+        if (!newStatus) return;
+        try {
+          await updateStatus(currentComplaintId, newStatus);
+          const complaint = await fetchComplaintById(currentComplaintId);
+          const replies = await fetchReplies(currentComplaintId);
+          renderModalContent(complaint, replies);
+        } catch (e) {
+          alert("Failed to update status");
+        }
+      }
+
+      async function submitReplyFromModal() {
+        const text = document.getElementById("replyText").value.trim();
+        if (!text) return;
+        try {
+          await addReply(currentComplaintId, "Administrator", text);
+          document.getElementById("replyText").value = "";
+          const complaint = await fetchComplaintById(currentComplaintId);
+          const replies = await fetchReplies(currentComplaintId);
+          renderModalContent(complaint, replies);
+        } catch (e) {
+          alert("Failed to add reply");
+        }
+      }
+    </script>
+  </body>
+</html>
