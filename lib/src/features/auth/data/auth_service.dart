@@ -20,36 +20,32 @@ class AuthService {
   // ---------- Login ----------
   Future<AuthResult> login(String email, String password) async {
     try {
-      // 1. Sign in with Firebase Auth
       final UserCredential userCred = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
-      // 2. Check email verification status
       if (!userCred.user!.emailVerified) {
-        await _auth.signOut(); // immediately sign out unverified users
+        await _auth.signOut();
         return AuthResult(
           success: false,
-          error: 'Please verify your email first. Check your inbox.',
+          error: 'Please verify your email first. Check your inbox or spam.',
         );
       }
 
-      // 3. Retrieve student details from your Supabase `users` table
       final response = await _supabase
           .from('users')
           .select()
           .eq('email', email)
-          .maybeSingle(); // safe: returns null if no row found
+          .maybeSingle();
 
       if (response == null) {
-        await _auth.signOut(); // no matching student profile – sign out
+        await _auth.signOut();
         return AuthResult(success: false, error: 'Student profile not found');
       }
 
       final data = response;
 
-      // 4. Save the three fields to SharedPreferences
       await _saveUserData(
         studentId: data['student_id'] ?? '',
         studentName: data['student_name'] ?? '',
@@ -72,7 +68,35 @@ class AuthService {
     required String password,
   }) async {
     try {
-      // 1. Create the Firebase Auth user
+      // 1. Check if student_id already exists in Supabase
+      final existingStudentId = await _supabase
+          .from('users')
+          .select('student_id')
+          .eq('student_id', studentId)
+          .maybeSingle();
+
+      if (existingStudentId != null) {
+        return AuthResult(
+          success: false,
+          error: 'This Student ID is already registered.',
+        );
+      }
+
+      // 2. Check if email already exists in Supabase
+      final existingEmail = await _supabase
+          .from('users')
+          .select('email')
+          .eq('email', email)
+          .maybeSingle();
+
+      if (existingEmail != null) {
+        return AuthResult(
+          success: false,
+          error: 'This email is already registered.',
+        );
+      }
+
+      // 3. Create Firebase Auth user
       final UserCredential userCred = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
@@ -80,28 +104,17 @@ class AuthService {
         return AuthResult(success: false, error: 'Registration failed');
       }
 
-      // 2. Check if this email already exists in the Supabase `users` table
-      final existing = await _supabase
-          .from('users')
-          .select('email')
-          .eq('email', email)
-          .maybeSingle();
+      // 4. Insert into Supabase
+      await _supabase.from('users').insert({
+        'student_id': studentId,
+        'student_name': studentName,
+        'email': email,
+      });
 
-      // 3. If not present, insert a new row (student_id is the PK)
-      if (existing == null) {
-        await _supabase.from('users').insert({
-          'student_id': studentId,
-          'student_name': studentName,
-          'email': email,
-          // created_at will use the DB default
-        });
-      }
-      // If a row already exists with this email, skip insertion – no duplication
-
-      // 4. Send email verification
+      // 5. Send verification email
       await userCred.user!.sendEmailVerification();
 
-      // 5. Sign them out immediately (they must verify before login)
+      // 6. Sign out – they must verify before login
       await _auth.signOut();
 
       return AuthResult(success: true);
@@ -130,7 +143,7 @@ class AuthService {
   Future<void> logout() async {
     await _auth.signOut();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // wipe saved student data
+    await prefs.clear();
   }
 
   // ---------- Check if logged in ----------
