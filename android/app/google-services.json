@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "345794110788",
+    "project_id": "complaint-registry-app",
+    "storage_bucket": "complaint-registry-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:345794110788:android:4bb17e510d480f0be26311",
+        "android_client_info": {
+          "package_name": "com.universitycomplaints.registry"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCA2r81VPnlE_5YGibNshr_kM4694_JWFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -57,7 +57,6 @@ class _AuthScreenState extends State<AuthScreen> {
         _emailCtrl.text.trim(),
         _passwordCtrl.text.trim(),
       );
-      Navigator.pushReplacementNamed(context, '/home');
     } else {
       result = await _authService.signUp(
         studentId: _studentIdCtrl.text.trim(),
@@ -68,19 +67,20 @@ class _AuthScreenState extends State<AuthScreen> {
     }
 
     setState(() => _isLoading = false);
-
     if (!mounted) return;
 
     if (result.success) {
-      AppSnackbar.success(
-        context,
-        _isLogin ? 'Welcome back!' : 'Account created!',
-      );
       if (_isLogin) {
-        // Navigate to home (replace with your route)
-        // Navigator.pushReplacementNamed(context, '/home');
+        // Login successful → go to Home
+        AppSnackbar.success(context, 'Welcome back!');
+        Navigator.pushReplacementNamed(context, '/home');
       } else {
-        // Automatically switch to login after successful signup
+        // Sign‑up successful → verification email sent
+        AppSnackbar.success(
+          context,
+          'Account created! Verification email sent. Please check your inbox or spam.',
+        );
+        // Switch to login tab
         setState(() => _isLogin = true);
         _clearSignUpFields();
       }
@@ -213,7 +213,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         if (result.success) {
                           AppSnackbar.success(
                             context,
-                            'Reset link sent! Check your inbox.',
+                            'Reset link sent! Check your inbox or spam.',
                           );
                         } else {
                           AppSnackbar.error(

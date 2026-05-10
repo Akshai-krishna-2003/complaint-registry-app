@@ -37,17 +37,19 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _checkAuth() async {
-    // Gives time to enjoy the splash while checking session
     await Future.delayed(const Duration(seconds: 2));
-    print('AuthService.isLoggedIn = ${AuthService.isLoggedIn}');
 
     if (!mounted) return;
 
-    if (AuthService.isLoggedIn) {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      Navigator.pushReplacementNamed(context, '/auth');
-    }
+    // Schedule navigation after the current build frame completes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (AuthService.isLoggedIn) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/auth');
+      }
+    });
   }
 
   @override
