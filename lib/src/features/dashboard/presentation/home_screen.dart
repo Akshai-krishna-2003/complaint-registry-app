@@ -3,6 +3,7 @@ import 'package:registry/src/common/app_theme.dart';
 import 'package:registry/src/features/auth/data/auth_service.dart';
 import 'package:registry/src/features/complaints/presentation/register_complaint_screen.dart';
 import 'package:registry/src/features/dashboard/presentation/profile_screen.dart';
+import 'package:registry/src/features/faq/presentation/faq_screen.dart';
 import 'package:registry/src/features/view_complaints/presentation/view_complaints_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -145,7 +146,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'FAQs',
                             color: const Color(0xFF5F6B7A),
                             onTap: () {
-                              // Navigator.pushNamed(context, '/faqs');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const FaqScreen(),
+                                ),
+                              );
                             },
                           ),
                         ],
