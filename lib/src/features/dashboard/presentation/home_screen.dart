@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:registry/src/common/app_theme.dart';
 import 'package:registry/src/features/auth/data/auth_service.dart';
+import 'package:registry/src/features/complaints/presentation/register_complaint_screen.dart';
 import 'package:registry/src/features/dashboard/presentation/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -114,7 +115,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             label: 'Register Complaint',
                             color: AppTheme.primary,
                             onTap: () {
-                              // Navigator.pushNamed(context, '/register-complaint');
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const RegisterComplaintScreen(),
+                                ),
+                              );
                             },
                           ),
                           const SizedBox(height: 16),
